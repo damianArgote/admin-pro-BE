@@ -34,10 +34,10 @@ const crearMedico = async (req, res = response) => {
 };
 
 const actualizarMedico = async (req, res) => {
-  const uid = req.params.id;
-
+  const id = req.params.id;
+  const uid = req.uid;
   try {
-    const medicoDb = await Medico.findById(uid);
+    const medicoDb = await Medico.findById(id);
 
     if (!medicoDb) {
       return res.status(404).json({
@@ -46,13 +46,18 @@ const actualizarMedico = async (req, res) => {
       });
     }
 
-    const { nombre, ...campos } = req.body;
+    const cambiosMedico = {
+      ...req.body,
+      usuario: uid,
+    };
 
-    campos.nombre = nombre;
-
-    const medicoActualizado = await Medico.findByIdAndUpdate(uid, campos, {
-      new: true,
-    });
+    const medicoActualizado = await Medico.findByIdAndUpdate(
+      id,
+      cambiosMedico,
+      {
+        new: true,
+      }
+    );
 
     return res.json({
       ok: true,
@@ -68,10 +73,10 @@ const actualizarMedico = async (req, res) => {
 };
 
 const borrarMedico = async (req, res) => {
-  const uid = req.params.id;
+  const id = req.params.id;
 
   try {
-    const medicoDb = await Medico.findById(uid);
+    const medicoDb = await Medico.findById(id);
 
     if (!medicoDb) {
       return res.status(404).json({
@@ -80,7 +85,7 @@ const borrarMedico = async (req, res) => {
       });
     }
 
-    await Medico.findByIdAndDelete(uid);
+    await Medico.findByIdAndDelete(id);
 
     return res.json({
       ok: true,
